@@ -2,7 +2,7 @@
 #include "Organism.h"
 #include <cstdlib>
 
-Field::Field(SDL_Renderer* renderer) : renderer(renderer) {
+Field::Field(SDL_Renderer* renderer) : renderer(renderer), sun_intensity(1.0f) {
     cells.resize(FIELD_WIDTH, std::vector<Organism*>(FIELD_HEIGHT, nullptr));
 
     // Spawn initial organisms
@@ -10,7 +10,7 @@ Field::Field(SDL_Renderer* renderer) : renderer(renderer) {
         int x = rand() % FIELD_WIDTH;
         int y = rand() % FIELD_HEIGHT;
         if (!cells[x][y]) {
-            cells[x][y] = new Organism(x, y);
+            cells[x][y] = new Organism(x, y, OrganismType::Photosynthetic);
         }
     }
 }
@@ -63,7 +63,6 @@ bool Field::add_organism(Organism* organism) {
     return true;
 }
 
-
 void Field::restart() {
     // Delete all organisms
     for (auto& row : cells) {
@@ -76,19 +75,17 @@ void Field::restart() {
     // Reset tick count and simulation state
     tick_count = 0;
     simulate = true;
+    sun_intensity = 1.0f;
 
     // Spawn new organisms
     for (int i = 0; i < 50; ++i) {
         int x = rand() % FIELD_WIDTH;
         int y = rand() % FIELD_HEIGHT;
         if (!cells[x][y]) {
-            cells[x][y] = new Organism(x, y);
+            cells[x][y] = new Organism(x, y, OrganismType::Photosynthetic);
         }
     }
 }
-
-
-
 
 bool Field::is_in_bounds(int x, int y) const {
     return x >= 0 && x < FIELD_WIDTH && y >= 0 && y < FIELD_HEIGHT;

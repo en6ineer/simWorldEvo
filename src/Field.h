@@ -18,6 +18,7 @@ private:
     SDL_Renderer* renderer;
     uint32_t tick_count = 0;
     bool simulate = true;
+    float sun_intensity = 1.0f; // Added for photosynthesis
 
 public:
     Field(SDL_Renderer* renderer);
@@ -34,4 +35,6 @@ public:
     void toggle_simulation() { simulate = !simulate; }
     uint32_t get_tick_count() const { return tick_count; }
     uint32_t get_organism_count() const;
+    float get_sun_intensity() const { return sun_intensity; }
+    void set_sun_intensity(float intensity) { sun_intensity = std::max(0.0f, std::min(2.0f, intensity)); }
 };
