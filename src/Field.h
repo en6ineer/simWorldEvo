@@ -6,8 +6,8 @@
 class Organism;
 
 // Constants
-constexpr int FIELD_WIDTH = 100;  // Cells
-constexpr int FIELD_HEIGHT = 50;  // Cells
+constexpr int FIELD_WIDTH = 120;  // Cells
+constexpr int FIELD_HEIGHT = 60;  // Cells
 constexpr int CELL_SIZE = 10;     // Pixels
 constexpr int FIELD_X = 10;       // Screen offset
 constexpr int FIELD_Y = 10;

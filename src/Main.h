@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "implot.h"
 #include "Field.h"
+#include "Organism.h"
 
 class Main {
 private:
@@ -19,6 +20,9 @@ private:
     void init_imgui();
     void draw_gui();
     void handle_input();
+
+    void handle_mouse_input(const SDL_Event& event); 
+    void create_organism(int mouse_x, int mouse_y, OrganismType type); 
 
 public:
     Main();

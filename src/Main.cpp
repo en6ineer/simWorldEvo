@@ -24,7 +24,7 @@ void Main::init_sdl() {
         exit(1);
     }
 
-    window = SDL_CreateWindow("MyOwnWorld", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("MyOwnWorld", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 800, SDL_WINDOW_SHOWN);
     if (!window) {
         std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
         exit(1);
@@ -51,7 +51,7 @@ void Main::draw_gui() {
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::SetNextWindowPos(ImVec2(600, 10));
+    ImGui::SetNextWindowPos(ImVec2(800, 10));
     ImGui::SetNextWindowSize(ImVec2(190, 580));
     ImGui::Begin("Control Panel", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     if (ImGui::Button(field->is_simulating() ? "Pause" : "Resume")) {
@@ -61,7 +61,7 @@ void Main::draw_gui() {
     if (ImGui::Button("Restart")) {
         field->restart();
     }
-    ImGui::SliderInt("TPS", &limit_tps, 1, 120);
+    ImGui::SliderInt("TPS", &limit_tps, 1, 150);
     tick_interval = 1000 / limit_tps;
     ImGui::Text("Organisms: %u", field->get_organism_count());
     ImGui::Text("Ticks: %u", field->get_tick_count());
@@ -79,15 +79,62 @@ void Main::draw_gui() {
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
 }
 
+
+
+
 void Main::handle_input() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL2_ProcessEvent(&event);
-        if (event.type == SDL_QUIT) {
-            running = false;
+        switch (event.type) {
+            case SDL_QUIT:
+                running = false;
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                    case SDLK_SPACE:
+                        field->toggle_simulation();
+                        break;
+                    case SDLK_r:
+                        field->restart();
+                        break;
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                handle_mouse_input(event); // Добавлено
+                break;
         }
     }
 }
+
+void Main::handle_mouse_input(const SDL_Event& event) {
+    // Игнорировать клики, если ImGui перехватывает мышь
+    if (ImGui::GetIO().WantCaptureMouse) {
+        return;
+    }
+
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            create_organism(event.button.x, event.button.y, OrganismType::Photosynthetic);
+        } else if (event.button.button == SDL_BUTTON_RIGHT) {
+            create_organism(event.button.x, event.button.y, OrganismType::Carnivorous);
+        }
+    }
+}
+
+void Main::create_organism(int mouse_x, int mouse_y, OrganismType type) {
+    // Преобразовать экранные координаты в координаты поля
+    int field_x = (mouse_x - FIELD_X) / CELL_SIZE;
+    int field_y = (mouse_y - FIELD_Y) / CELL_SIZE;
+
+    // Проверить, что координаты внутри поля и клетка свободна
+    if (field->is_in_bounds(field_x, field_y) && !field->get_organism(field_x, field_y)) {
+        Organism* organism = new Organism(field_x, field_y, type);
+        field->add_organism(organism);
+    }
+}
+
+
 
 void Main::run() {
     while (running) {
@@ -104,6 +151,8 @@ void Main::run() {
         SDL_RenderPresent(renderer);
     }
 }
+
+
 
 int main() {
     Main app;

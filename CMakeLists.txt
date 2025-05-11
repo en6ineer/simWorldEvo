@@ -36,7 +36,7 @@ set(SOURCE_FILES
     src/Main.cpp
     src/Field.cpp
     src/Organism.cpp
-    src/NeuralNet.cpp
+    #src/NeuralNet.cpp
 )
 
 # Include directories
